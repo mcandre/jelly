@@ -84,6 +84,8 @@ GNU `head` features support for `-n` with negative values, removing the need for
 
 A shell function shadowing `jelly` would alleviate the need to manually append `| sh` to each run. One day, jq may even implement a syntax for executing shell commands on its own.
 
+Much JSON related work will be simplified when the format officially adopts a comment syntax, preferably one that integrates well with UNIX shebangs.
+
 # REQUIREMENTS
 
 * a UNIX environment with [coreutils](https://www.gnu.org/software/coreutils/) / [base](http://ftp.freebsd.org/pub/FreeBSD/releases/) / [macOS](https://www.apple.com/macos) / [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) / etc.
