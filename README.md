@@ -72,11 +72,42 @@ Here, we see an concise jelly build system with a single `test` task.
 
 Naturally, you will want to replace uninformative `echo 'Pass'` commands with some real commands relevant to your specific testing needs.
 
-### Dry Run
+```sh
+#!/usr/bin/env jq -nrf --args
+{
+    "test": "echo 'Pass'",
+    "lint": "find . -iname '*.json' -print -exec jq . '{}' \\;"
+}
+| .[($ARGS.positional[0] // "test")]
+```
+
+Here, we see another task, `lint`, defined in a context for common JSON validation requirements. jq can serve as quick a linter of basic JSON document integrity, aside from any schema validation requirements. However, the wrapping in UNIX `find` will *not* preserve failing exit codes in the event of a linter warning. Pick some more robust linting commands for use in a larger CI/CD pipeline. Also, find's `-print` flag creates a lot of noise.
+
+## Usage Menu
+
+```sh
+#!/usr/bin/env jq -nrf --args
+{
+    "test": "echo 'Pass'",
+    "lint": "find . -iname '*.json' -print -exec jq . '{}' \\;",
+    "help": "printf \"Usage: ./jelly <task> | sh\\n\\nTasks:\\n\\n\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +2 | jq -r 'keys | .[]'"
+}
+| .[($ARGS.positional[0] // "test")]
+```
+
+Finally, we have a `help` task devoted to generating a usage menu. This is valuable for anyone running the script, to remind them of the valid names of the tasks. The more tasks configured, the more useful the menu becomes.
+
+This menu operates by extracting the task names from the script and generating a corresponding help message. Note that both `tail -r` reversal subcommands are used purely for portability, and are not expected to scale with the number of tasks configured in the build system. But this is not a serious build system. (Neither is NPM run-script, or make.)
+
+This is an experiment in what is possible to do with minimal tools available, while promoting same-programming-language development scripts for more projects.
+
+## Dry Run
 
 For debugging, temporarily drop `| sh` to see a dry run of the commands that jelly would have executed.
 
 ## Further Research
+
+We should improve validation so that typos are caught and transformed into a request for the usage menu. Currently, invalid task names sent to `./jelly` result in empty output. Strange output like that is ver bad to send to `sh`. Perhaps POSIX has something to say about what `sh` should even do with null output. That may not be well defined behavior, or present a security risk to some operating systems. In any case, the user deserves a more specific error message.
 
 A looping mechanism would add support for processing multiple targets in a single `./jelly <task> <task> <task>`... invocation.
 
