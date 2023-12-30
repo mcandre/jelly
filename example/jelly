@@ -1,0 +1,7 @@
+#!/usr/bin/env jq -nrf --args
+{
+    "test": "echo 'Pass'",
+    "lint": "find . -iname '*.json' -print -exec jq . '{}' \\;",
+    "help": "printf \"Usage: ./jelly <task> | sh\\n\\nTasks:\\n\\n\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +2 | jq -r 'keys | .[]'"
+}
+| .[($ARGS.positional[0] // "test")]
