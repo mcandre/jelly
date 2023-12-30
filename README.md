@@ -97,9 +97,7 @@ Here, we see another task, `lint`, defined in a context for common JSON validati
 
 Finally, we have a `help` task devoted to generating a usage menu. This is valuable for anyone running the script, to remind them of the valid names of the tasks. The more tasks configured, the more useful the menu becomes.
 
-This menu operates by extracting the task names from the script and generating a corresponding help message. Note that both `tail -r` reversal subcommands are used purely for portability, and are not expected to scale with the number of tasks configured in the build system. But this is not a serious build system. (Neither is NPM run-script, or make.)
-
-This is an experiment in what is possible to do with minimal tools available, while promoting same-programming-language development scripts for more projects.
+This menu operates by extracting the task names from the script and generating a corresponding help message. Note that both `tail -r` reversal subcommands are used purely for portability, and are not expected to scale with the number of tasks configured in the build system. But this is not a serious build system. (Neither is NPM run-script, or make.) In fact, there are dozens of bespoke JSON-based build systems. They're all quite awful, including this one! Shell commands are hard enough to manage, without the underpowered and overly strict nature of JSON. But we list some of the least bad alternative build sytems below. Rather, jelly is an experiment in what is possible to do with minimal tools available, while promoting same-programming-language development scripts for more projects.
 
 ## Dry Run
 
