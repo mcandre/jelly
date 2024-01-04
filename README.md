@@ -45,16 +45,17 @@ Note that additional quoting may be required for certain characters, according t
 #!/bin/sh
 jq -r '.[($ARGS.positional[0] // "test")]' --args $* <<HERE | sh
 {
-    "test": "echo 'Pass'"
+    "test": "echo 'Pass'",
+    "lint": "find . -iname '*.json' -print -exec jq . '{}' \\\\;"
 }
 HERE
 ```
 
-Above, we see an concise jelly build system with a single `test` task, an `echo` shell command.
+Above, we see an concise jelly build system with a two tasks: `test` and `lint`.
 
-Note that the JSON configuration resides inside of a shell heredoc. In addition to any JSON string escapes, certain special characters like backslash (`\`) and dollar (`$`) in your shell commands there, will require additional backslash escapes.
+Note that the JSON configuration resides inside of a shell heredoc. In addition to any JSON string escapes, certain special characters like backslash (`\`) and dollar (`$`) in your task shell commands, will require additional backslash escapes.
 
-Naturally, you will want to replace uninformative `echo 'Pass'` commands with some real commands relevant to your specific testing needs.
+Naturally, you will want to replace uninformative `echo 'Pass'` test command with some real commands relevant to your specific testing needs.
 
 The jq expression `// "test"` declares the `test` task as the default, when no task is named when jelly runs.
 
@@ -65,12 +66,13 @@ The jq expression `// "test"` declares the `test` task as the default, when no t
 jq -r '.[($ARGS.positional[0] // "test")]' --args $* <<HERE | sh
 {
     "test": "echo 'Pass'",
+    "lint": "find . -iname '*.json' -print -exec jq . '{}' \\\\;",
     "help": "printf \\"Usage: ./jelly [<task>]\\\\n\\\\nTasks:\\\\n\\\\n\\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +3 | sed 's/\\\\\\\\\\\\\\\\/\\\\\\\\/g' | jq -r 'keys | .[]'"
 }
 HERE
 ```
 
-The canned `help` task generates a usage menu. It works by extracting the task names from its own jelly script. Again, note that certain heredoc characters are doubly escaped.
+The canned `help` task generates a usage menu. It works by extracting the task names from its own jelly script.
 
 ## Dry Run
 
