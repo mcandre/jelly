@@ -1,7 +1,8 @@
-#!/usr/bin/env jq -nrf --args
+#!/bin/sh
+jq -r '.[($ARGS.positional[0] // "test")]' --args $* <<HERE | sh
 {
     "test": "echo 'Pass'",
-    "lint": "find . -iname '*.json' -print -exec jq . '{}' \\;",
-    "help": "printf \"Usage: ./jelly <task> | sh\\n\\nTasks:\\n\\n\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +2 | jq -r 'keys | .[]'"
+    "lint": "find . -iname '*.json' -print -exec jq . '{}' \\\\;",
+    "help": "printf \\"Usage: ./jelly [<task>]\\\\n\\\\nTasks:\\\\n\\\\n\\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +3 | sed 's/\\\\\\\\\\\\\\\\/\\\\\\\\/g' | jq -r 'keys | .[]'"
 }
-| .[($ARGS.positional[0] // "test")]
+HERE

@@ -9,18 +9,18 @@ A basic build system cobbled together from the jq JSON utility and a handful of 
 ```console
 $ cd example
 
-$ ./jelly | sh
+$ ./jelly
 Pass
 
-$ ./jelly test | sh
+$ ./jelly test
 Pass
 
-$ ./jelly lint | sh
+$ ./jelly lint
 ./bad.json
 parse error: Expected another key-value pair at line 3, column 1
 
-$ ./jelly help | sh
-Usage: ./jelly <task> | sh
+$ ./jelly help
+Usage: ./jelly [<task>]
 
 Tasks:
 
@@ -33,22 +33,6 @@ test
 
 The build system is configured with a jq script named `jelly` (no file extension). The file should feature `chmod +x` permissions.
 
-## Shebang!
-
-```console
-#!/usr/bin/env jq -nrf --args
-```
-
-`#!` is the classic UNIX marker that signals the shell to apply a different interpreter to execute the rest of the script. `/usr/bin/env jq` informs the shell where to find the jq interpreter, whose absolute path will differ between operating systems.
-
-The `-n` flag informs jq to not stall and expect instructions from stdin.
-
-The `-r` flag informs jq to emit output in raw form, so that the shell commands it emits will not be wrapped in JSON document braces.
-
-The `-f` flag informs jq to process the rest of the script as a series of jq instructions.
-
-The `--args` flag informs jq to receive all successive command line arguments supplied (to `./jelly`) in the standard jq `$ARGS.positional` array variable.
-
 ## Create a task
 
 jelly tasks are created with shell command strings, indexed by task name in a single JSON document.
@@ -58,52 +42,29 @@ A task may specify multiple shell commands through the conventional semicolon (`
 Note that additional quoting may be required for certain characters, according to traditional C-style backslash syntax.
 
 ```sh
-#!/usr/bin/env jq -nrf --args
+#!/bin/sh
+jq -r '.[($ARGS.positional[0] // "test")]' --args $* <<HERE | sh
 {
     "test": "echo 'Pass'"
 }
-| .[($ARGS.positional[0] // "test")]
-
+HERE
 ```
 
-Here, we see an concise jelly build system with a single `test` task.
+Above, we see an concise jelly build system with a single `test` task, an `echo` shell command.
 
-`// "test"` declares the `test` task as the default, when no task is named when jelly runs.
+Note that the JSON configuration resides inside of a shell heredoc. In addition to any JSON string escapes, certain special characters like backslash (`\`) and dollar (`$`) in your shell commands there, will require additional backslash escapes.
 
 Naturally, you will want to replace uninformative `echo 'Pass'` commands with some real commands relevant to your specific testing needs.
 
-```sh
-#!/usr/bin/env jq -nrf --args
-{
-    "test": "echo 'Pass'",
-    "lint": "find . -iname '*.json' -print -exec jq . '{}' \\;"
-}
-| .[($ARGS.positional[0] // "test")]
-```
-
-Here, we see another task, `lint`, defined in a context for common JSON validation requirements. jq can serve as quick a linter of basic JSON document integrity, aside from any schema validation requirements. However, the wrapping in UNIX `find` will *not* preserve failing exit codes in the event of a linter warning. Pick some more robust linting commands for use in a larger CI/CD pipeline. Also, find's `-print` flag creates a lot of noise.
-
-## Usage Menu
-
-```sh
-#!/usr/bin/env jq -nrf --args
-{
-    "test": "echo 'Pass'",
-    "lint": "find . -iname '*.json' -print -exec jq . '{}' \\;",
-    "help": "printf \"Usage: ./jelly <task> | sh\\n\\nTasks:\\n\\n\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +2 | jq -r 'keys | .[]'"
-}
-| .[($ARGS.positional[0] // "test")]
-```
-
-Finally, we have a `help` task devoted to generating a usage menu. This is valuable for anyone running the script, to remind them of the valid names of the tasks. The more tasks configured, the more useful the menu becomes.
-
-This menu operates by extracting the task names from the script and generating a corresponding help message. Note that both `tail -r` reversal subcommands are used purely for portability, and are not expected to scale with the number of tasks configured in the build system. But this is not a serious build system. (Neither is NPM run-script, or make.) In fact, there are dozens of bespoke JSON-based build systems. They're all quite awful, including this one! Shell commands are hard enough to manage, without the underpowered and overly strict nature of JSON. But we list some of the least bad alternative build sytems below. Rather, jelly is an experiment in what is possible to do with minimal tools available, while promoting same-programming-language development scripts for more projects.
+The jq expression `// "test"` declares the `test` task as the default, when no task is named when jelly runs.
 
 ## Dry Run
 
-For debugging, temporarily drop `| sh` to see a dry run of the commands that jelly would have executed.
+For debugging, temporarily replace `| sh` with `| cat` to see the command strings that jelly would have executed.
 
 ## Further Research
+
+There is probably a way for json to perform the simple text substitution duties on raw string text input, which would remove the need for sed in usage menu generation.
 
 We should improve validation so that typos are caught and transformed into a request for the usage menu. Currently, invalid task names sent to `./jelly` result in empty output. Strange output like that is ver bad to send to `sh`. Perhaps POSIX has something to say about what `sh` should even do with null output. That may not be well defined behavior, or present a security risk to some operating systems. In any case, the user deserves a more specific error message.
 
@@ -111,14 +72,13 @@ A looping mechanism would add support for processing multiple targets in a singl
 
 GNU `head` features support for `-n` with negative values, removing the need for inefficient `tail -r` file content reversal.
 
-A shell function shadowing `jelly` would alleviate the need to manually append `| sh` to each run. One day, jq may even implement a syntax for executing shell commands on its own.
-
 Much JSON related work will be simplified when the format officially adopts a comment syntax, preferably one that integrates well with UNIX shebangs.
 
 # REQUIREMENTS
 
 * a UNIX environment with [coreutils](https://www.gnu.org/software/coreutils/) / [base](http://ftp.freebsd.org/pub/FreeBSD/releases/) / [macOS](https://www.apple.com/macos) / [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) / etc.
 * [jq](https://jqlang.github.io/jq/) 1.6+
+* [sed](https://pubs.opengroup.org/onlinepubs/009695299/utilities/sed.html)
 
 # SEE ALSO
 
