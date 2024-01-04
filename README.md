@@ -58,6 +58,20 @@ Naturally, you will want to replace uninformative `echo 'Pass'` commands with so
 
 The jq expression `// "test"` declares the `test` task as the default, when no task is named when jelly runs.
 
+## Usage menu
+
+```sh
+#!/bin/sh
+jq -r '.[($ARGS.positional[0] // "test")]' --args $* <<HERE | sh
+{
+    "test": "echo 'Pass'",
+    "help": "printf \\"Usage: ./jelly [<task>]\\\\n\\\\nTasks:\\\\n\\\\n\\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +3 | sed 's/\\\\\\\\\\\\\\\\/\\\\\\\\/g' | jq -r 'keys | .[]'"
+}
+HERE
+```
+
+The canned `help` task generates a usage menu. It works by extracting the task names from its own jelly script. Again, note that certain heredoc characters are doubly escaped.
+
 ## Dry Run
 
 For debugging, temporarily replace `| sh` with `| cat` to see the command strings that jelly would have executed.
