@@ -43,15 +43,21 @@ Note that additional quoting may be required for certain characters, according t
 
 ```sh
 #!/bin/sh
-jq -r '.[($ARGS.positional[0] // "test")]' --args $* <<HERE | sh
+unset IFS
+set -euf
+
+jq -r '.[($ARGS.positional[0] // "test")]' --args "$@" <<HERE | sh
 {
     "test": "echo 'Pass'",
     "lint": "find . -iname '*.json' -print -exec jq . '{}' \\\\;"
 }
 HERE
+
 ```
 
-Above, we see an concise jelly build system with a two tasks: `test` and `lint`.
+Above, we see a stripped down jelly build system, with just two tasks, `test` and `lint`.
+
+The three opening lines `#!/bin/sh`, `unset IFS`, `set -euf` setup a robust, POSIX compliant shell script wrapper around an inner jq script. This allows jelly to automatically process task commands with `| sh`.
 
 Note that the JSON configuration resides inside of a shell heredoc. In addition to any JSON string escapes, certain special characters like backslash (`\`) and dollar (`$`) in your task shell commands, will require additional backslash escapes.
 
@@ -63,11 +69,14 @@ The jq expression `// "test"` declares the `test` task as the default, when no t
 
 ```sh
 #!/bin/sh
-jq -r '.[($ARGS.positional[0] // "test")]' --args $* <<HERE | sh
+unset IFS
+set -euf
+
+jq -r '.[($ARGS.positional[0] // "test")]' --args "$@" <<HERE | sh
 {
     "test": "echo 'Pass'",
     "lint": "find . -iname '*.json' -print -exec jq . '{}' \\\\;",
-    "help": "printf \\"Usage: ./jelly [<task>]\\\\n\\\\nTasks:\\\\n\\\\n\\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +3 | sed 's/\\\\\\\\\\\\\\\\/\\\\\\\\/g' | jq -r 'keys | .[]'"
+    "help": "printf \\"Usage: ./jelly [<task>]\\\\n\\\\nTasks:\\\\n\\\\n\\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +6 | sed 's/\\\\\\\\\\\\\\\\/\\\\\\\\/g' | jq -r 'keys | .[]'"
 }
 HERE
 ```
