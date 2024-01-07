@@ -16,6 +16,10 @@ $ ./jelly test
 Pass
 
 $ ./jelly lint
+./good.json
+{
+  "count": 3
+}
 ./bad.json
 parse error: Expected another key-value pair at line 3, column 1
 
@@ -49,10 +53,9 @@ set -euf
 jq -r '.[($ARGS.positional[0] // "test")]' --args "$@" <<HERE | sh
 {
     "test": "echo 'Pass'",
-    "lint": "find . -iname '*.json' -print -exec jq . '{}' \\\\;"
+    "lint": "for f in \$(find . -iname '*.json' -print); do echo \\"\$f\\" && jq . \\"\$f\\"; done"
 }
 HERE
-
 ```
 
 Above, we see a stripped down jelly build system, with just two tasks, `test` and `lint`.
@@ -75,7 +78,7 @@ set -euf
 jq -r '.[($ARGS.positional[0] // "test")]' --args "$@" <<HERE | sh
 {
     "test": "echo 'Pass'",
-    "lint": "find . -iname '*.json' -print -exec jq . '{}' \\\\;",
+    "lint": "for f in \$(find . -iname '*.json' -print); do echo \\"\$f\\" && jq . \\"\$f\\"; done",
     "help": "printf \\"Usage: ./jelly [<task>]\\\\n\\\\nTasks:\\\\n\\\\n\\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +6 | sed 's/\\\\\\\\\\\\\\\\/\\\\\\\\/g' | jq -r 'keys | .[]'"
 }
 HERE
