@@ -16,12 +16,16 @@ $ ./jelly test
 Pass
 
 $ ./jelly lint
-./good.json
+./good-2.json
 {
   "count": 3
 }
 ./bad.json
 parse error: Expected another key-value pair at line 3, column 1
+./good-1.json
+{
+  "count": 3
+}
 
 $ ./jelly help
 Usage: ./jelly [<task>]
@@ -53,7 +57,7 @@ set -euf
 jq -r '.[($ARGS.positional[0] // "test")]' --args "$@" <<HERE | sh
 {
     "test": "echo 'Pass'",
-    "lint": "for f in \$(find . -iname '*.json' -print); do echo \\"\$f\\" && jq . \\"\$f\\"; done"
+    "lint": "find . -iname '*.json' -print -execdir jq . \\"{}\\" +"
 }
 HERE
 ```
@@ -78,7 +82,7 @@ set -euf
 jq -r '.[($ARGS.positional[0] // "test")]' --args "$@" <<HERE | sh
 {
     "test": "echo 'Pass'",
-    "lint": "for f in \$(find . -iname '*.json' -print); do echo \\"\$f\\" && jq . \\"\$f\\"; done",
+    "lint": "find . -iname '*.json' -print -execdir jq . \\"{}\\" +",
     "help": "printf \\"Usage: ./jelly [<task>]\\\\n\\\\nTasks:\\\\n\\\\n\\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +6 | sed 's/\\\\\\\\\\\\\\\\/\\\\\\\\/g' | jq -r 'keys | .[]'"
 }
 HERE
@@ -104,9 +108,10 @@ Much JSON related work will be simplified when the format officially adopts a co
 
 # REQUIREMENTS
 
-* a UNIX environment with [coreutils](https://www.gnu.org/software/coreutils/) / [base](http://ftp.freebsd.org/pub/FreeBSD/releases/) / [macOS](https://www.apple.com/macos) / [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) / etc.
+* GNU or BSD [findutils](https://en.wikipedia.org/wiki/Find_(Unix))
 * [jq](https://jqlang.github.io/jq/) 1.6+
 * [sed](https://pubs.opengroup.org/onlinepubs/009695299/utilities/sed.html)
+* POSIX compatible [sh](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/sh.html)
 
 # SEE ALSO
 

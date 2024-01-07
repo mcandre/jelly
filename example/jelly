@@ -5,7 +5,7 @@ set -euf
 jq -r '.[($ARGS.positional[0] // "test")]' --args "$@" <<HERE | sh
 {
     "test": "echo 'Pass'",
-    "lint": "for f in \$(find . -iname '*.json' -print); do echo \\"\$f\\" && jq . \\"\$f\\"; done",
+    "lint": "find . -iname '*.json' -print -execdir jq . \\"{}\\" +",
     "help": "printf \\"Usage: ./jelly [<task>]\\\\n\\\\nTasks:\\\\n\\\\n\\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +6 | sed 's/\\\\\\\\\\\\\\\\/\\\\\\\\/g' | jq -r 'keys | .[]'"
 }
 HERE
