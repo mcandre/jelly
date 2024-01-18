@@ -57,7 +57,7 @@ set -euf
 jq -r '.[($ARGS.positional[0] // "test")]' --args "$@" <<HERE | sh
 {
     "test": "echo 'Pass'",
-    "lint": "find . -iname '*.json' -print -execdir jq . \\"{}\\" +"
+    "lint": "find . -type f -iname '*.json' -print -execdir jq . \\"{}\\" +"
 }
 HERE
 ```
@@ -82,7 +82,7 @@ set -euf
 jq -r '.[($ARGS.positional[0] // "test")]' --args "$@" <<HERE | sh
 {
     "test": "echo 'Pass'",
-    "lint": "find . -iname '*.json' -print -execdir jq . \\"{}\\" +",
+    "lint": "find . -type f -iname '*.json' -print -execdir jq . \\"{}\\" +",
     "help": "printf \\"Usage: ./jelly [<task>]\\\\n\\\\nTasks:\\\\n\\\\n\\"; tail -r ./jelly | tail -n +2 | tail -r | tail -n +6 | sed 's/\\\\\\\\\\\\\\\\/\\\\\\\\/g' | jq -r 'keys | .[]'"
 }
 HERE
