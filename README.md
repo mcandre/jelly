@@ -119,6 +119,7 @@ Much JSON related work will be simplified when the format officially adopts a co
 * [bashate](https://github.com/openstack/bashate), a shell script style linter
 * [bb](https://github.com/mcandre/bb), a build system for (g)awk projects
 * [beltaloada](https://github.com/mcandre/beltaloada), a guide to writing build systems for (POSIX) sh
+* [booty](https://github.com/mcandre/booty?tab=readme-ov-file) for JS/Node.js/altJS
 * [Gradle](https://gradle.org/), a build system for JVM projects
 * [lake](https://luarocks.org/modules/steved/lake), a Lua task runner
 * [Leiningen](https://leiningen.org/) + [lein-exec](https://github.com/kumarshantanu/
