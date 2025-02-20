@@ -108,10 +108,14 @@ Much JSON related work will be simplified when the format officially adopts a co
 
 # REQUIREMENTS
 
-* GNU or BSD [findutils](https://en.wikipedia.org/wiki/Find_(Unix))
+* [GNU](https://www.gnu.org/)/[BSD](https://en.wikipedia.org/wiki/Berkeley_Software_Distribution) [findutils](https://en.wikipedia.org/wiki/Find_(Unix))
 * [jq](https://jqlang.github.io/jq/) 1.6+
 * [sed](https://pubs.opengroup.org/onlinepubs/009695299/utilities/sed.html)
 * POSIX compatible [sh](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/sh.html)
+
+## Recommended
+
+* [zsh](https://www.zsh.org/)
 
 # SEE ALSO
 
